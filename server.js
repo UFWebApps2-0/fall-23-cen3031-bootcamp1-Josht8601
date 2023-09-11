@@ -1,4 +1,4 @@
-var http = require('http'), 
+var http = require('http'),
     fs = require('fs'), 
     port = 8080;
 
@@ -9,6 +9,8 @@ var requestHandler = function(request, response) {
   /*Investigate the request object. 
     You will need to use several of its properties: url and method
   */
+    var url = request.url;
+    var method = request.method;
   //console.log(request);
 
   /*
@@ -29,6 +31,15 @@ var requestHandler = function(request, response) {
     Helpful example: if-else structure- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/if...else
 
     */
+
+    if (method === 'GET' && url === '/listings') {
+        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.end(JSON.stringify(listingData));
+    }
+    else {
+        response.writeHead(404, { 'Content-Type': 'text/plain' });
+        response.end('404 not found');
+    }
 };
 
 fs.readFile('listings.json', 'utf8', function(err, data) {
@@ -50,11 +61,19 @@ fs.readFile('listings.json', 'utf8', function(err, data) {
   
 
    //Save the data in the listingData variable already defined
-  
+    if (err) {
+        throw err;
+    }
+
+    listingData = JSON.parse(data);
 
   //Creates the server
+    server = http.createServer(requestHandler);
   
   //Start the server
+    server.listen(port, function () {
+        console.log('Server listening on port ' + port);
+    });
 
 
 });
